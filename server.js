@@ -1,128 +1,3 @@
-// import express from "express";
-// import mongoose from "mongoose";
-// import cors from "cors";
-// import multer from "multer";
-// import { v2 as cloudinary } from "cloudinary";
-// import streamifier from "streamifier";
-// import dotenv from "dotenv";
-
-// dotenv.config();
-
-// const app = express();
-// const PORT = process.env.PORT || 5000;
-// const API_PREFIX = "/api";
-
-// app.use(cors());
-// app.use(express.json());
-
-// // Cloudinary config
-// cloudinary.config({
-// cloud_name:"dfqoetbhv",
-// api_key:"376748484657273",
-// api_secret:"SR9dTAqBX9YCgRGfIXwk07Cza6o"
-
-// });
-
-
-// // MongoDB
-// const MONGO_URI = "mongodb+srv://alimassri:alimassri9617@cluster06.q9vvhx0.mongodb.net/hortallaDB?retryWrites=true&w=majority&appName=Cluster06";
-// mongoose.connect(MONGO_URI).then(() => console.log("✅ MongoDB connected")).catch(err => console.error(err));
-
-// // Schemas
-// const noteSchema = new mongoose.Schema({
-//   text: String,
-//   imageUrl: String,
-//   createdAt: { type: Date, default: Date.now }
-// });
-// const Note = mongoose.model("Note", noteSchema);
-
-// const calendarSchema = new mongoose.Schema({
-//   date: String,
-//   event: String,
-//   createdAt: { type: Date, default: Date.now }
-// });
-// const CalendarItem = mongoose.model("CalendarItem", calendarSchema);
-
-// // Multer
-// const storage = multer.memoryStorage();
-// const upload = multer({ storage });
-
-// // Admin login
-// import crypto from "crypto";
-// const ADMIN_USERNAME_MD5 = crypto.createHash("md5").update("issamkaram9617").digest("hex");
-// const ADMIN_PASSWORD_MD5 = crypto.createHash("md5").update("issamkaram9617").digest("hex");
-
-// app.post(`${API_PREFIX}/admin/login`, (req, res) => {
-//   const { username, password } = req.body;
-//   if (username === ADMIN_USERNAME_MD5 && password === ADMIN_PASSWORD_MD5) {
-//     return res.json({ success: true });
-//   }
-//   return res.status(401).json({ success: false, message: "Invalid credentials" });
-// });
-
-// // Notes
-// app.get(`${API_PREFIX}/notes`, async (req, res) => {
-//   const notes = await Note.find().sort({ createdAt: -1 });
-//   res.json(notes);
-// });
-
-// app.post(`${API_PREFIX}/notes`, upload.single("image"), async (req, res) => {
-//   try {
-//     const text = req.body.text;
-//     let imageUrl = "";
-
-//     if (req.file) {
-//       const result = await new Promise((resolve, reject) => {
-//         const stream = cloudinary.uploader.upload_stream({ folder: "hortalla" }, (error, result) => {
-//           if (result) resolve(result);
-//           else reject(error);
-//         });
-//         streamifier.createReadStream(req.file.buffer).pipe(stream);
-//       });
-//       imageUrl = result.secure_url;
-//     }
-
-//     const note = new Note({ text, imageUrl });
-//     await note.save();
-//     res.status(201).json(note);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: err.message });
-//   }
-// });
-
-// app.delete(`${API_PREFIX}/notes/:id`, async (req, res) => {
-//   try {
-//     const note = await Note.findByIdAndDelete(req.params.id);
-//     if (!note) return res.status(404).json({ message: "Note not found" });
-//     res.json({ success: true });
-//   } catch (err) {
-//     res.status(500).json({ message: err.message });
-//   }
-// });
-
-// // Calendar
-// app.get(`${API_PREFIX}/calendar`, async (req, res) => {
-//   const events = await CalendarItem.find().sort({ date: 1 });
-//   res.json(events);
-// });
-
-// app.post(`${API_PREFIX}/calendar`, async (req, res) => {
-//   const { date, event } = req.body;
-//   const ev = new CalendarItem({ date, event });
-//   await ev.save();
-//   res.status(201).json(ev);
-// });
-
-// app.delete(`${API_PREFIX}/calendar/:id`, async (req, res) => {
-//   await CalendarItem.findByIdAndDelete(req.params.id);
-//   res.json({ success: true });
-// });
-
-// app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-
-
-
 // server.js
 import express from "express";
 import mongoose from "mongoose";
@@ -143,21 +18,17 @@ const API_PREFIX = "/api";
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-// Cloudinary config
+// ---------------- Cloudinary ----------------
 cloudinary.config({
-cloud_name:"dfqoetbhv",
-api_key:"376748484657273",
-api_secret:"SR9dTAqBX9YCgRGfIXwk07Cza6o"
-
+  cloud_name: process.env.CLOUD_NAME || process.env.CLOUD_CLOUD_NAME || "dfqoetbhv",
+  api_key: process.env.CLOUD_API_KEY || "376748484657273",
+  api_secret: process.env.CLOUD_API_SECRET || "SR9dTAqBX9YCgRGfIXwk07Cza6o",
 });
 
-// MongoDB connect
-const MONGO_URI = "mongodb+srv://alimassri:alimassri9617@cluster06.q9vvhx0.mongodb.net/hortallaDB?retryWrites=true&w=majority&appName=Cluster06";
+// ---------------- MongoDB ----------------
+// put your connection string in .env as MONGO_URI
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://alimassri:alimassri9617@cluster06.q9vvhx0.mongodb.net/hortallaDB?retryWrites=true&w=majority&appName=Cluster06";
 
-if (!MONGO_URI) {
-  console.error("Missing MONGO_URI in .env");
-  process.exit(1);
-}
 mongoose
   .connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
@@ -166,11 +37,11 @@ mongoose
     process.exit(1);
   });
 
-// Multer memory storage
+// ---------------- Multer (memory) ----------------
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Models
+// ---------------- Mongoose models ----------------
 const noteSchema = new mongoose.Schema({
   text: { type: String, required: true },
   imageUrl: String,
@@ -185,14 +56,13 @@ const calendarSchema = new mongoose.Schema({
 });
 const CalendarItem = mongoose.model("CalendarItem", calendarSchema);
 
-// Admin credentials (from .env)
-// store plain admin user/pass in .env (or hashed) — here we compare plain then create token
+// ---------------- Admin & JWT config ----------------
+// You can override these via .env
 const ADMIN_USER = process.env.ADMIN_USER || "issamkaram9617";
 const ADMIN_PASS = process.env.ADMIN_PASS || "issamkaram9617";
 const JWT_SECRET = process.env.JWT_SECRET || "replace_this_with_a_strong_secret";
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h"; // 1 hour
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h";
 
-// Helpers
 function generateToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
@@ -205,30 +75,42 @@ function authMiddleware(req, res, next) {
   const token = parts[1];
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) return res.status(401).json({ message: "Invalid or expired token" });
-    req.admin = decoded; // { user: ADMIN_USER }
+    req.admin = decoded;
     next();
   });
 }
 
-// Routes
-
+// ---------------- Routes ----------------
 app.get("/", (req, res) => res.send("Hortalla API running"));
 
 // Admin login
-// Accepts { username, password } in JSON body (plain text). Returns { token } if ok.
-// You can replace this with hashed password compare if needed.
+// Accepts either plain username/password or MD5-hashed values depending on client
 app.post(`${API_PREFIX}/admin/login`, (req, res) => {
-  const { username, password } = req.body || {};
-  if (!username || !password) return res.status(400).json({ message: "username and password required" });
+  try {
+    const { username, password, md5 } = req.body || {};
+    if (!username || !password) return res.status(400).json({ message: "username and password required" });
 
-  // OPTIONAL: support MD5 hashed submission: if client sends MD5 you can compare hashes.
-  // Here we accept plain text compare (safer if using HTTPS). If you want MD5 from frontend,
-  // you can compare crypto.createHash('md5').update(ADMIN_USER).digest('hex') etc.
-  if (username === ADMIN_USER && password === ADMIN_PASS) {
-    const token = generateToken({ user: ADMIN_USER });
-    return res.json({ success: true, token, expiresIn: JWT_EXPIRES_IN });
-  } else {
+    // If client indicates md5=true then compare against md5(ADMIN_USER)/md5(ADMIN_PASS)
+    if (md5) {
+      const adminUserMd5 = crypto.createHash("md5").update(ADMIN_USER).digest("hex");
+      const adminPassMd5 = crypto.createHash("md5").update(ADMIN_PASS).digest("hex");
+      if (username === adminUserMd5 && password === adminPassMd5) {
+        const token = generateToken({ user: ADMIN_USER });
+        return res.json({ success: true, token, expiresIn: JWT_EXPIRES_IN });
+      }
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+
+    // default: plain compare (recommended to use HTTPS)
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+      const token = generateToken({ user: ADMIN_USER });
+      return res.json({ success: true, token, expiresIn: JWT_EXPIRES_IN });
+    }
+
     return res.status(401).json({ success: false, message: "Invalid credentials" });
+  } catch (err) {
+    console.error("admin/login error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
@@ -275,7 +157,7 @@ app.delete(`${API_PREFIX}/notes/:id`, authMiddleware, async (req, res) => {
     const id = req.params.id;
     const note = await Note.findByIdAndDelete(id);
     if (!note) return res.status(404).json({ message: "Note not found" });
-    // We don't delete Cloudinary image here (could be implemented if you stored public_id)
+    // optionally delete Cloudinary resource if you stored public_id
     res.json({ success: true });
   } catch (err) {
     console.error("DELETE /notes error:", err);
