@@ -49,8 +49,8 @@ const upload = multer({ storage });
 
 // Admin login
 import crypto from "crypto";
-const ADMIN_USERNAME_MD5 = crypto.createHash("md5").update("issamkaram9617").digest("hex");
-const ADMIN_PASSWORD_MD5 = crypto.createHash("md5").update("issamkaram9617").digest("hex");
+const ADMIN_USERNAME_MD5 = crypto.createHash("md5").update("issamkaram123321").digest("hex");
+const ADMIN_PASSWORD_MD5 = crypto.createHash("md5").update("issamkaram123321").digest("hex");
 
 app.post(`${API_PREFIX}/admin/login`, (req, res) => {
   const { username, password } = req.body;
@@ -69,6 +69,10 @@ app.get(`${API_PREFIX}/notes`, async (req, res) => {
 app.post(`${API_PREFIX}/notes`, upload.single("image"), async (req, res) => {
   try {
     const text = req.body.text;
+    const secret=req.body.secret;
+    if (secret !== "issamkaram71522270") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
     let imageUrl = "";
 
     if (req.file) {
@@ -92,6 +96,7 @@ app.post(`${API_PREFIX}/notes`, upload.single("image"), async (req, res) => {
 });
 
 app.delete(`${API_PREFIX}/notes/:id`, async (req, res) => {
+
   try {
     const note = await Note.findByIdAndDelete(req.params.id);
     if (!note) return res.status(404).json({ message: "Note not found" });
@@ -109,6 +114,10 @@ app.get(`${API_PREFIX}/calendar`, async (req, res) => {
 
 app.post(`${API_PREFIX}/calendar`, async (req, res) => {
   const { date, event } = req.body;
+  const secret=req.body.secret; 
+  if (secret !== "issamkaram71522270") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
   const ev = new CalendarItem({ date, event });
   await ev.save();
   res.status(201).json(ev);
