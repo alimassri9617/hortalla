@@ -49,8 +49,8 @@ const upload = multer({ storage });
 
 // Admin login
 import crypto from "crypto";
-const ADMIN_USERNAME_MD5 = crypto.createHash("md5").update("alimassri9617").digest("hex");
-const ADMIN_PASSWORD_MD5 = crypto.createHash("md5").update("alimassri9617").digest("hex");
+const ADMIN_USERNAME_MD5 = crypto.createHash("md5").update("issamkaram9617").digest("hex");
+const ADMIN_PASSWORD_MD5 = crypto.createHash("md5").update("issamkaram9617").digest("hex");
 
 app.post(`${API_PREFIX}/admin/login`, (req, res) => {
   const { username, password } = req.body;
