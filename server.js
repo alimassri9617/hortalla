@@ -25,7 +25,7 @@ api_secret:"SR9dTAqBX9YCgRGfIXwk07Cza6o"
 
 
 // MongoDB
-const MONGO_URI = "mongodb+srv://alimassri:alimassri9617@cluster06.q9vvhx0.mongodb.net/hortallaDB?retryWrites=true&w=majority&appName=Cluster06";
+const MONGO_URI = "mongodb+srv://aamalialmassri1234567_db_user:knLrByuyckvnWF8w@raj.wtfd32l.mongodb.net/?appName=raj";
 mongoose.connect(MONGO_URI).then(() => console.log("✅ MongoDB connected")).catch(err => console.error(err));
 
 // Schemas
